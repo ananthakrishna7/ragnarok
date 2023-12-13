@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
 import object.OBJ_Heart;
 import object.OBJ_Key;
 import object.SuperObject;
@@ -21,6 +20,9 @@ public class UI {
     public String message = " ";
     int messageCounter = 0;
     public boolean gameFinished = false;
+    public int slotCol = 0;
+    public int slotRow = 0;
+    public int commandNum = 0;
     public String currentDialogue = " ";
     
     public UI(GamePanel gp){
@@ -29,7 +31,7 @@ public class UI {
         arial20 = new Font("Arial", Font.PLAIN, 10);
         arial_30 = new Font("Arial", Font.PLAIN, 30);
         arial_80B = new Font("Arial", Font.BOLD, 80);
-        OBJ_Key key = new OBJ_Key();
+        OBJ_Key key = new OBJ_Key(gp);
         key_image = key.image;
 
         //create HUD object
@@ -113,6 +115,11 @@ public class UI {
         //character status screen
         if(gp.gameState == gp.characterState){
             drawCharacterScreen();
+            drawInventory();
+        }
+
+        if(gp.gameState == gp.gameOverState){
+            drawGameoverScreen();
         }
 
     }
@@ -162,7 +169,7 @@ public class UI {
     public void drawCharacterScreen() {
         
         //create a frama
-        final int frameX = gp.tileSize *2;
+        final int frameX = gp.tileSize ;
         final int frameY = gp.tileSize;
         final int frameWidth = gp.tileSize * 7;
         final int frameHeight = gp.tileSize * 10;
@@ -263,6 +270,67 @@ public class UI {
         g2.drawImage(gp.player.currentWeapon.down1, tailX - gp.tileSize , textY , null );
     }
 
+    public void drawInventory() {
+        int frameX = gp.tileSize* 10;
+        int frameY = gp.tileSize;
+        int frameWidth = gp.tileSize * 6;
+        int frameHeight = gp.tileSize * 5;
+
+        drawSubWindow(frameX, frameY, frameWidth, frameHeight);
+
+        //slots for items
+
+        final int slotXStart = frameX + 20;
+        final int slotYStart = frameY + 20;
+        int slotX = slotXStart;
+        int slotY = slotYStart;
+
+        //draw player's items
+
+        for(int i = 0 ; i < gp.player.inventory.size(); i++){
+
+            //equipping items
+
+            g2.drawImage(gp.player.inventory.get(i).image, slotX, slotY, null);
+
+            slotX += gp.tileSize;
+
+            if(i == 4 || i == 9 || i ==14 ){
+                slotX = slotXStart;
+                slotY += gp.tileSize;
+            }
+        }       
+
+        //cursor for moving items and selecting items
+        int cursorX = slotXStart + (gp.tileSize * slotCol);
+        int cursorY =  slotYStart + (gp.tileSize * slotRow);
+        int cursorWidth = gp.tileSize;
+        int cursorHeight = gp.tileSize;
+
+        //draw the cursor
+        g2.setColor(Color.white);
+        g2.setStroke(new BasicStroke(3));
+        g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 10, 10);
+
+    }
+    
+    public int getItemIndexOnSlot(){
+
+        int itemIndex = slotCol + (slotRow * 5);
+        return itemIndex;
+
+    }
+
+    public void drawDialogueScreen() {
+
+        int x = gp.tileSize * 2;
+        int y = gp.tileSize / 2;
+        int width = gp.screenWidth - (gp.tileSize*4);
+        int height = gp.tileSize * 4;
+
+        drawSubWindow(x, y, width, height);
+    }
+
     public void drawSubWindow(int x, int y, int width, int height){
 
         Color c = new Color(0,0,0);
@@ -278,18 +346,48 @@ public class UI {
 
     public void drawGameoverScreen() {
 
-        g2.setColor(Color.red);
-        String text = "GAME OVER";
-        String subt = "Start again from the beginning. Close the window now.";
-        int x = getXforCenteredText(text);
-        int y = gp.screenHeight/2;
+        g2.setColor(new Color(0,0,0,150));
+        g2.fillRect(0,0, gp.screenWidth, gp.screenHeight);
 
-        g2.drawString(text,x,y);
-        x = getXforCenteredText(subt);
-        g2.setFont(arial20);
-        y = y + gp.tileSize;
-        g2.setColor(Color.yellow);
-        g2.drawString(subt, x, y);
+        int x ;
+        int y ;
+        String text;
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60f));
+
+        text = "Game over :(";
+
+        //shadow effects
+        g2.setColor(Color.black);
+        x = getXforCenteredText(text);
+        y = gp.tileSize * 4;
+        g2.drawString(text, x, y);
+
+        //main stuff
+
+        g2.setColor(Color.WHITE);
+        g2.drawString(text, x-4,y-4);
+
+        //retry
+
+        // g2.setFont(g2.getFont().deriveFont(40f));
+        // text = "Retry";
+        // x = getXforCenteredText(text);
+        // y += gp.tileSize * 4;
+        // g2.drawString(text, x, y);
+        // if(commandNum == 0){
+        //     g2.drawString(">", x-40, y);
+        // }
+
+        // //back to the title screen
+
+        // text = "Quit";
+        // x = getXforCenteredText(text);
+        // y += 55;
+        // g2.drawString(text, x, y);
+        // if(commandNum == 1){
+        //     g2.drawString(">", x-40, y);
+        // }
+
     }
 
     public int getXforCenteredText(String text){

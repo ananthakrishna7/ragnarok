@@ -45,4 +45,9 @@ public class EventHandler {
 
         return hit;
     }
+
+    // public void healingPool(int col, int row, int gameState){
+
+    //     if(gp.)
+    // }
 }

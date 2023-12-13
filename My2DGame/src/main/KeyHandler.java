@@ -7,7 +7,7 @@ public class KeyHandler implements KeyListener {
 
     GamePanel gp;
     
-    public boolean enterPressed, upPressed, downPressed, leftPressed, rightPressed, JPressed, escPressed;
+    public boolean enterPressed, upPressed, downPressed, leftPressed, rightPressed, JPressed, escPressed, qPressed;
 
     boolean checkDrawTime;
 
@@ -25,6 +25,9 @@ public class KeyHandler implements KeyListener {
 
         int code = e.getKeyCode();
 
+        if (code == KeyEvent.VK_Q){
+            qPressed = true;
+        }
         if(code == KeyEvent.VK_W){
             upPressed = true;
         }
@@ -74,6 +77,57 @@ public class KeyHandler implements KeyListener {
         if(escPressed == true){
             gp.gameState = gp.characterState;
         }
+
+        if(code == KeyEvent.VK_W){
+            if(gp.ui.slotRow !=0 ){
+                gp.ui.slotRow--;
+            }
+        }        
+        if(code == KeyEvent.VK_A){
+            if(gp.ui.slotCol != 0 ){
+                gp.ui.slotCol--;
+            }
+        }        
+        if(code == KeyEvent.VK_S){
+            if(gp.ui.slotRow != 3){
+                gp.ui.slotRow++;
+            }
+        }        
+        if(code == KeyEvent.VK_D){
+            if(gp.ui.slotCol != 4){
+                gp.ui.slotCol++;
+            }
+        } 
+        
+        if(code  == KeyEvent.VK_ENTER){
+            gp.player.selectItem();
+        }
+
+        // if(gp.gameState == gp.gameOverState){
+        //     if(code == KeyEvent.VK_UP){
+        //         gp.ui.commandNum--;
+        //         if(gp.ui.commandNum < 0){
+        //             gp.ui.commandNum = 1;
+        //         }
+        //     }
+        //     if(code == KeyEvent.VK_DOWN){
+        //         gp.ui.commandNum++;
+        //         if(gp.ui.commandNum > 1){
+        //             gp.ui.commandNum = 0;
+        //         }
+        //     }
+
+        //     if(code == KeyEvent.VK_O){
+        //         if(gp.ui.commandNum == 0){
+        //             gp.gameState = gp.playState;
+        //         }
+        //         else if (gp.ui.commandNum == 1){
+        //             gp.gameState = gp.pauseState;
+        //         }
+        //     }
+        // }
+
+        
     }
 
     
@@ -111,6 +165,7 @@ public class KeyHandler implements KeyListener {
         if(escPressed == false){
             gp.gameState = gp.playState;
         }
+
     }
     
 }

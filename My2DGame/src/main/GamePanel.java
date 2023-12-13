@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 import entity.Entity;
@@ -18,8 +20,8 @@ public class GamePanel extends JPanel implements Runnable{
     final int scale  = 3;
 
     public final int tileSize = originaTileSize * scale; //48x48 tile
-    public final int maxScreenCol = 18;
-    public final int maxScreenRow = 14;
+    public final int maxScreenCol = 16;
+    public final int maxScreenRow = 12;
     public final int screenWidth = tileSize * maxScreenCol; 
     public final int screenHeight  =  tileSize * maxScreenRow;
 
@@ -30,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable{
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
-    int FPS = 60;
+    int FPS = 200;
 
     TileManager tileM = new TileManager(this);
 
@@ -40,10 +42,11 @@ public class GamePanel extends JPanel implements Runnable{
     public CollisionChecker cChecker = new CollisionChecker(this);
     public Player player =  new Player(this,keyH);
     public SuperObject obj[] = new SuperObject[10];
+    ArrayList<Entity> entityList = new ArrayList<>();
 
     //npc
     public Entity npc[] = new Entity[10];
-    public Entity monster[] = new Entity[50];
+    public Entity monster[] = new Entity[100];
 
     //sound settigns
     // Sound sound = new Sound();
@@ -63,6 +66,7 @@ public class GamePanel extends JPanel implements Runnable{
     public final int playState = 1;
     public final int pauseState = 2;
     public final int characterState = 3;
+    public final int gameOverState = 4;
     // public final int deadState = 0;
 
     

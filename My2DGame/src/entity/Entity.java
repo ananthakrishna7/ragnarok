@@ -15,11 +15,31 @@ import main.UtilityTool;
 public class Entity {
     
    GamePanel gp;
+   public int getLeftX() {
+    return worldX + solidArea.x;
+   }
+   public int getRightX() {
+    return worldX + solidArea.x + solidArea.width;
+   }
+   public int getTopY(){
+    return worldY + solidArea.y;
+   }
+
+   public int getBottomY() {
+    return worldY + solidArea.y + solidArea.height;
+   }
+   public int getCol() {
+    return (worldX + solidArea.x)/gp.tileSize;
+   }
+   public int getRow() {
+    return (worldY + solidArea.y)/gp.tileSize;
+   }
+
    public int worldX, worldY ;
    public int speed;
    public BufferedImage up0, up1, up2, up3, up4, down1, down0, down2, down3, down4, left0, left1, left2, left3, left4 , left5, right5, right0, right1, right2, right3, right4;
    public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2, attackLeft1, attackLeft2, attackRight1, attackRight2;
-   public String direction;
+   public String direction = "down";
    public int spriteCounter = 0;
    public int spriteNum = 1;
    public Rectangle solidArea = new Rectangle(0,0,48,48);
@@ -34,8 +54,10 @@ public class Entity {
    int dyingCounter = 0;
    String dialogues[] = new String[20];
 
+   public BufferedImage image, image2, image3;
+   public String name;
+   public boolean collision = false;
 
-   public int type; // 0 = player, 1 = npc, 2 = monster
    boolean attacking  = false;
    public boolean alive = true;
    public boolean dying = false;
@@ -55,7 +77,15 @@ public class Entity {
     public Entity currentWeapon;
 
     //item attributes
-    public int attackValue ; 
+    public int attackValue ;
+    
+    //types
+    public int type ;
+    public final int type_player =0;
+    public final int type_npc = 1;
+    public final int type_monster = 2;
+    public final int type_consumable = 3;
+    public final int type_obstacle = 4;
 
    public Entity(GamePanel gp){
       this.gp = gp;
@@ -63,6 +93,9 @@ public class Entity {
 
    public void setAction() {}
    public void damageReaction () {}
+
+   public void interact() {}
+   public void use(Entity entity) {}
    public void update() {
 
         setAction();
@@ -73,10 +106,17 @@ public class Entity {
         gp.cChecker.checkEntity(this, gp.monster);
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
-        if(this.type == 2 && contactPlayer == true){
+        if(this.type == type_monster && contactPlayer == true){
 
             if(gp.player.invincible == false){
-                gp.player.life = gp.player.life-1;
+
+                int damage = attack - gp.player.defense;
+
+                if(damage < 0){
+                    damage = 0;
+                }
+
+                gp.player.life -= damage;
                 gp.player.invincible = true;
             }
         }

@@ -3,11 +3,15 @@ package entity;
 import main.KeyHandler;
 import main.UtilityTool;
 import object.OBJ_Sword;
+import object.SuperObject;
+import object.OBJ_Key;
+import object.OBJ_Potion;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import main.GamePanel;
 
@@ -20,6 +24,9 @@ public class Player extends Entity {
 
     public final int screenX;
     public final int screenY;
+
+    public ArrayList<SuperObject> inventory = new ArrayList<>();
+    public final int inventorySize = 20;
 
     public int hasKey = 0;
 
@@ -41,11 +48,12 @@ public class Player extends Entity {
         solidArea.height = 30;
 
         attackArea.width = 36;
-        attackArea.height = 36; 
+        attackArea.height = 36;
 
         setDefaultValues();
         getPlayerImage();
         getPlayerAttackImage();
+        setItems();
     }
 
     public void setDefaultValues() {
@@ -66,6 +74,27 @@ public class Player extends Entity {
         attack = getAttack();
         maxHealth = 6;
         life = maxHealth;
+    }
+
+    public void setDefaultPositions() {
+
+        worldX = gp.tileSize * 23;
+        worldY = gp.tileSize * 21;
+        direction = "down";
+    }
+
+    public void restoreLife() {
+        life = maxHealth;
+        invincible = false;
+    }
+
+    public void setItems() {
+
+        inventory.clear();
+
+        inventory.add(new OBJ_Key(gp));
+        inventory.add(new OBJ_Key(gp));
+        
     }
 
     public int getAttack() {
@@ -220,7 +249,13 @@ public class Player extends Entity {
             }
         }
 
+        if(life <= 0){
+            gp.gameState = gp.gameOverState;
+        }
+
     }
+
+
 
     public void performAttack() {
 
@@ -271,35 +306,51 @@ public class Player extends Entity {
 
     public void pickupObject(int i){
 
-        if (i != 999){
-            String objectName = gp.obj[i].name;
+        // if (i != 999){
+        //     String objectName = gp.obj[i].name;
 
-            switch(objectName){
-                case "Key":
-                    hasKey ++;
-                    gp.obj[i] = null;
-                    gp.ui.showMessage("Key acquired!");
-                    break;
-                case "Door":
-                    if(hasKey > 0){
-                        gp.obj[i] = null;
-                        hasKey -- ;
-                        gp.ui.showMessage("Door unlocked, lost the key in the process !!");
-                    }else{
-                        gp.ui.showMessage("You need a key to open this door!!");
-                    }
-                    System.out.println("Key: " + hasKey);
-                    break;
-                case "Boot":
-                    speed = speed+ 1;
-                    gp.obj[i] =null;
-                    gp.ui.showMessage("Speed increased !!");
-                    break;
-                case "Chest":
-                    gp.ui.gameFinished = true;
-                    break;
+        //     switch(objectName){
+        //         case "Key":
+        //             hasKey ++;
+        //             gp.obj[i] = null;
+        //             gp.ui.showMessage("Key acquired!");
+        //             break;
+        //         case "Door":
+        //             if(hasKey > 0){
+        //                 gp.obj[i] = null;
+        //                 hasKey -- ;
+        //                 gp.ui.showMessage("Door unlocked, lost the key in the process !!");
+        //             }else{
+        //                 gp.ui.showMessage("You need a key to open this door!!");
+        //             }
+        //             System.out.println("Key: " + hasKey);
+        //             break;
+        //         case "Boot":
+        //             speed = speed+ 1;
+        //             gp.obj[i] =null;
+        //             gp.ui.showMessage("Speed increased !!");
+        //             break;
+        //         case "Chest":
+        //             gp.ui.gameFinished = true;
+        //             break;
+        //     }
+
+        // }
+
+        if(i != 999){
+
+            String text;
+
+            if(inventory.size() != inventorySize){
+
+                inventory.add(gp.obj[i]);
+                text = "Got a " + gp.obj[i].name + " !";
+            }else{
+
+                text = "You cannot carry any more";
             }
-
+            gp.ui.showMessage(text);
+            gp.obj[i]=null;
         }
     }
 
@@ -313,7 +364,14 @@ public class Player extends Entity {
         if(i != 999){
 
             if(invincible == false){
-                life = life - 1;
+
+                int damage = gp.monster[i].attack - defense;
+
+                if(damage < 0){
+                    damage = 0;
+                }
+
+                life -= damage;
                 invincible = true;
             }
         }
@@ -322,17 +380,59 @@ public class Player extends Entity {
     public void damageMonster(int i ){
         if(i != 999){
             if (gp.monster[i].invincible == false){
-                gp.monster[i].life -= 1;
+
+                int damage = attack - gp.monster[i].defense;
+
+                if(damage < 0){
+                    damage = 0;
+                }
+
+                gp.monster[i].life -= damage;
                 gp.monster[i].invincible = true;
                 gp.monster[i].damageReaction();
 
                 if(gp.monster[i].life <= 0){
                     gp.monster[i].dying = true;
+                    exp += gp.monster[i].exp;
+                    checkLevelUp();
                 }
             }
         }
     }
     
+    public void checkLevelUp() {
+
+        if(exp >= nextLevelExp){
+            gp.player.level ++;
+            nextLevelExp = nextLevelExp * 2 + 3;
+            maxHealth += 2;
+            strength ++;
+            dexterity ++;
+            attack = getAttack();
+            defense = getDefense();
+        }
+    }
+
+    public void selectItem() {
+
+        int itemIndex = gp.ui.getItemIndexOnSlot();
+
+        if(itemIndex < inventory.size()){
+
+            SuperObject selectedItem = inventory.get(itemIndex);
+
+            if(selectedItem.type == type_consumable){
+                
+
+                gp.player.life += OBJ_Potion.value;
+                if(gp.player.life > gp.player.maxHealth){
+                    gp.player.life = gp.player.maxHealth;
+                }
+                //later
+            }
+        }
+    }
+
     public void draw(Graphics2D g2){
 
         BufferedImage image = null;
