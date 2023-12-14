@@ -7,7 +7,7 @@ import main.GamePanel;
 import main.UtilityTool;
 
 public class SuperObject {
-    
+     GamePanel gp;    
    public BufferedImage image, image2, image3;
    public String name;
    public boolean collision = false;
@@ -15,6 +15,13 @@ public class SuperObject {
    public Rectangle solidArea = new Rectangle(0,0,48,48);
    public int solidAreaDefaultX = 0; 
    public int solidAreaDefaultY = 0;
+
+   public int type ;
+   public final int type_player =0;
+   public final int type_npc = 1;
+   public final int type_monster = 2;
+   public final int type_consumable = 3;
+   public final int type_obstacle  =4;
 
    UtilityTool uTool = new UtilityTool();
 
@@ -53,5 +60,16 @@ public class SuperObject {
         bottomOffset > gp.worldHeight - gp.player.worldY) {
        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null); 
       }  
-     }
+    }
+    
+
+    public void interact() {
+
+        
+        String text ;
+        text = "You need a key to open this.";
+        gp.ui.showMessage(text);
+    
+    }
+    
 }

@@ -12,6 +12,7 @@ public class NPC_OldMan  extends Entity{
         direction = "down";
         speed = 1;
         getImage();
+        setDialogue();
     }
 
     public void getImage(){
@@ -40,6 +41,11 @@ public class NPC_OldMan  extends Entity{
         right3 = setup("/home/praneeth/sem3Projects/oop/My2DGame/res/nes/tile104", gp.tileSize, gp.tileSize);
         right4 = setup("/home/praneeth/sem3Projects/oop/My2DGame/res/nes/tile102", gp.tileSize, gp.tileSize);
         
+    }
+
+    public void setDialogue() {
+
+        dialogues[0] = " hello lad";
     }
 
     public void setAction() {

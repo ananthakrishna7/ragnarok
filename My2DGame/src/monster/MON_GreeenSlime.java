@@ -11,11 +11,15 @@ public class MON_GreeenSlime  extends Entity{
     public MON_GreeenSlime(GamePanel gp){
         super(gp);
         this.gp = gp;
-        type =2;
+        type = type_monster;
         speed = 1;
         maxHealth = 4;
         life = maxHealth;
         direction = "down";
+        
+        attack = 1;
+        defense = 0;
+        exp = 2;
 
         solidArea.x = 3;
         solidArea.y = 18;
